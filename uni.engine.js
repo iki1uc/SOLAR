@@ -1,7 +1,11 @@
-// ─── PIPELINEBLITZ · SOLAR-KERNEL ───────────────────────────────
-// RUN · FEUERICE · 3Ø9Ø81 · 360° Transport
+// ─── UNI-ENGINE · FINALVERSION ───────────────────────────────
+// Transport · Rotation · Pipelineblitz · FeuerIce · 360°
+// arbeitet kohärent mit Algorithmik.RUN()
 
-export const Pipelineblitz = {
+import { Algorithmik } from "./algorithmik.js";
+import { CacheDriver } from "./cache.driver.js";
+
+export const UNIEngine = {
 
   // 1) INIT · Startimpuls
   init(values) {
@@ -13,36 +17,29 @@ export const Pipelineblitz = {
     this.blitz = true;
   },
 
-  // 2) CORE · Dreiecksachse → 360° Rotation
+  // 2) CORE · Achsen aus Algorithmik holen
   core(values) {
-    const nums = values.map(Number).filter(n => !isNaN(n)).sort((a,b)=>a-b);
+    const calc = Algorithmik.RUN(values);
 
-    this.axis3 = nums;
-    this.axis9 = nums.map((v,i)=>({
-      value: v,
-      index: i,
-      degree: i * 40,                 // 9 Punkte → 360° / 9
-      vector: i === 0 ? 0 : v - nums[i-1],
-      percent: (v / nums[nums.length-1]) * 100,
-      te: v + "te"
-    });
-
-    this.life360 = this.axis9.map(a => a.degree);
+    this.axis3 = calc.axis3;
+    this.axis9 = calc.axis9;
+    this.axis27 = calc.axis27;
+    this.axis81 = calc.axis81;
+    this.pipeline21 = calc.pipeline21;
+    this.life360 = calc.life360;
   },
 
-  // 3) BLITZ · Pipeline21 · FeuerIce
+  // 3) BLITZ · FeuerIce-Impuls
   blitz() {
-    this.pipeline21 = this.axis9.map(a => ({
+    this.blitz21 = this.pipeline21.map(a => ({
       ...a,
-      half: a.value * 0.5,
-      full: a.value,
-      delta: a.full - a.half,
       fire: a.vector >= 0,
-      ice: a.vector < 0
+      ice: a.vector < 0,
+      pulse: Math.abs(a.vector)
     }));
   },
 
-  // 4) GRAVITATION · Bindung · Stabilisierung
+  // 4) GRAVITATION · Stabilisierung
   graviton() {
     this.RAM = {
       RAW: this.raw.length,
@@ -59,19 +56,11 @@ export const Pipelineblitz = {
     };
   },
 
-  // 5) RUN · Vollausführung
-  RUN(values) {
-    this.init(values);
-    this.core(values);
-    this.blitz();
-    this.graviton();
-    return {
-      axis3: this.axis3,
-      axis9: this.axis9,
-      pipeline21: this.pipeline21,
-      graviton: this.RAM,
-      sorted: this.SORTED,
-      life360: this.life360
-    };
-  }
-};
+  // 5) CACHE · Schatten speichern
+  cache(key) {
+    CacheDriver.store(key, this.raw);
+    this.shadow = CacheDriver.respond(key);
+  },
+
+  // 6) RUN · Vollausführung
+  RUN(key, values
