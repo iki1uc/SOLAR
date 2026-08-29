@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>BEWEGUNG · Vektor · RUN</title>
+<style>
+body { background:#000; color:#0f0; font-family:Consolas; padding:20px; }
+pre { font-size:16px; }
+</style>
+</head>
+<body>
+
+<h2>BEWEGUNG · Vektor</h2>
+<pre id="out">INIT…</pre>
+
+<script type="module">
+import { Schwingung } from "./uni.engine.js";
+
+let f = 0;
+
+function tick(){
+    f++;
+    const s = Schwingung.calc(f);
+
+    document.getElementById("out").innerText = `
+BEWEGUNG FRAME ${f}
+
+Vektor: ${s.energy - s.solar}
+Solar: ${s.solar}
+Energie: ${s.energy}
+Gravitation: ${s.gravitation}
+Schwingung: ${s.swing}
+`;
+}
+
+setInterval(tick, 200);
+</script>
+
+</body>
+</html>
