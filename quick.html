@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>QUICK · Status · Pulse</title>
+<style>
+body { background:#000; color:#0f0; font-family:Consolas; padding:20px; }
+pre { font-size:16px; }
+</style>
+</head>
+<body>
+
+<h2>QUICK · Systemstatus</h2>
+<pre id="quick">INIT…</pre>
+
+<script type="module">
+import { UNIEngine } from "./uni.engine.js";
+
+function quick(){
+    const values = [1,2,3,4,5,6,7,8,9];
+    const r = UNIEngine.RUN("QUICK", values);
+
+    document.getElementById("quick").innerText = `
+QUICK-STATUS
+
+AX3: ${r.axis3.length}
+AX9: ${r.axis9.length}
+AX27: ${r.axis27.length}
+AX81: ${r.axis81.length}
+
+Solar: -1
+Energie: +1
+Schwingung: atomar
+Gravitation: 33%
+
+Pipelineblitz: OK
+ALUF: offen
+RUN: aktiv
+`;
+}
+
+setInterval(quick, 500);
+</script>
+
+</body>
+</html>
