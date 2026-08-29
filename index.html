@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INDEX · VERNARRATIVIERT · IMPULSE · SOLAR</title>
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: #0a0806;
+            color: #c8b89a;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 720px;
+            width: 100%;
+            background: #0d0a07;
+            border: 1px solid #2a1a1a;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            letter-spacing: 8px;
+            color: #c8b89a;
+            text-align: center;
+            font-weight: 300;
+            border-bottom: 1px solid #1a1a1a;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        h1 .highlight {
+            color: #8a7a6a;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #5a4a3a;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .grid-item {
+            background: #0a0806;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 12px 8px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            font-size: 0.6rem;
+            color: #5a4a3a;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .grid-item:hover {
+            border-color: #8a7a6a;
+            color: #c8b89a;
+            background: #0d0a07;
+            box-shadow: 0 0 30px rgba(200,180,120,0.03);
+        }
+
+        .grid-item .icon {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .grid-item.active {
+            border-color: #8a7a6a;
+            color: #c8b89a;
+        }
+
+        #status {
+            margin: 15px 0;
+            padding: 10px 15px;
+            font-size: 0.65rem;
+            color: #5a4a3a;
+            letter-spacing: 2px;
+            text-align: center;
+            border-top: 1px solid #1a1a1a;
+            border-bottom: 1px solid #1a1a1a;
+            min-height: 40px;
+            line-height: 1.8;
+        }
+
+        #status .value { color: #8a7a6a; }
+        #status .highlight { color: #c8b89a; }
+        #status .ok { color: #6a8a6a; }
+        #status .warn { color: #8a7a4a; }
+
+        #log {
+            width: 100%;
+            height: 120px;
+            background: #060504;
+            color: #3a2a1a;
+            border: 1px solid #1a1a1a;
+            padding: 10px;
+            overflow: auto;
+            font-size: 0.55rem;
+            font-family: monospace;
+            border-radius: 4px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        #log .key { color: #6a5a4a; }
+        #log .num { color: #8a7a6a; }
+        #log .str { color: #c8b89a; }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .controls button {
+            background: transparent;
+            color: #5a4a3a;
+            border: 1px solid #1a1a1a;
+            padding: 6px 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.6rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .controls button:hover {
+            background: #1a1a1a;
+            color: #c8b89a;
+            border-color: #5a4a3a;
+        }
+
+        .controls button.primary {
+            border-color: #5a4a3a;
+            color: #8a7a6a;
+        }
+
+        .controls button.primary:hover {
+            background: #5a4a3a;
+            color: #0a0806;
+        }
+
+        .footer {
+            margin-top: 15px;
+            font-size: 0.5rem;
+            color: #1a1a1a;
+            letter-spacing: 4px;
+            text-align: center;
+        }
+
+        .pulse-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #3a2a1a;
+            margin-right: 6px;
+            transition: all 0.3s;
+        }
+
+        .pulse-indicator.active {
+            background: #8a7a6a;
+            box-shadow: 0 0 20px rgba(200,180,120,0.2);
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 15px; }
+            h1 { font-size: 1.2rem; letter-spacing: 4px; }
+            .grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>INDEX · <span class="highlight">VERNARRATIVIERT</span></h1>
+    <div class="subtitle">IMPULS‑GESTEUERT · 3Ø9Ø81 · SEN·SA·TION</div>
+
+    <div class="grid" id="grid">
+        <div class="grid-item" data-module="hall">
+            <span class="icon">🏛️</span>
+            HALLE
+        </div>
+        <div class="grid-item" data-module="bewegung">
+            <span class="icon">⚡</span>
+            BEWEGUNG
+        </div>
+        <div class="grid-item" data-module="licht">
+            <span class="icon">☀️</span>
+            LICHT
+        </div>
+        <div class="grid-item" data-module="lacht">
+            <span class="icon">😄</span>
+            LACHT
+        </div>
+        <div class="grid-item" data-module="quick">
+            <span class="icon">⚡</span>
+            QUICK
+        </div>
+        <div class="grid-item" data-module="mona">
+            <span class="icon">🖼️</span>
+            MONA LISA
+        </div>
+        <div class="grid-item" data-module="sensation">
+            <span class="icon">🌀</span>
+            SEN·SA·TION
+        </div>
+        <div class="grid-item" data-module="pover">
+            <span class="icon">⚡</span>
+            POVER‑ENERGIE
+        </div>
+        <div class="grid-item" data-module="aluf">
+            <span class="icon">🌌</span>
+            ALUF
+        </div>
+    </div>
+
+    <div id="status">
+        <span class="pulse-indicator" id="pulse"></span>
+        ⏳ IMPULS‑WARTE · <span class="highlight">SYSTEM BEREIT</span>
+    </div>
+
+    <div class="controls">
+        <button class="primary" id="btnRun">▶ RUN IMPULS</button>
+        <button id="btnReset">⟲ RESET</button>
+        <button id="btnNarrativ">📖 NARRATIV</button>
+        <button id="btnAlgo">🧠 ALGORITHMIEREN</button>
+    </div>
+
+    <div id="log">⏳ Warten auf Impuls...</div>
+
+    <div class="footer">SOLAR · ALUF · EVOTAAL · NIRWANA · SEN·SA·TION · POVER‑ENERGIE</div>
+</div>
+
+<script type="importmap">
+{
+    "imports": {
+        "./algorithmik.js": "./algorithmik.js",
+        "./cache.driver.js": "./cache.driver.js",
+        "./graviton.js": "./graviton.js",
+        "./uni.engine.js": "./uni.engine.js",
+        "./aluf.js": "./aluf.js",
+        "./evotaal.js": "./evotaal.js",
+        "./nirwana.js": "./nirwana.js"
+    }
+}
+</script>
+
+<script type="module">
+// ─── IMPORTS ────────────────────────────────────────────────
+import { Algorithmik } from './algorithmik.js';
+import { CacheDriver } from './cache.driver.js';
+import { UNIEngine } from './uni.engine.js';
+import { ALUF } from './aluf.js';
+import { EVOTAAL } from './evotaal.js';
+import { NIRWANA } from './nirwana.js';
+
+// ─── DOM ────────────────────────────────────────────────────
+const status = document.getElementById('status');
+const log = document.getElementById('log');
+const pulse = document.getElementById('pulse');
+const grid = document.getElementById('grid');
+
+const btnRun = document.getElementById('btnRun');
+const btnReset = document.getElementById('btnReset');
+const btnNarrativ = document.getElementById('btnNarrativ');
+const btnAlgo = document.getElementById('btnAlgo');
+
+// ─── ROOT ────────────────────────────────────────────────────
+const ROOT = { height: 480, width: 480, depth: 480 };
+
+// ─── STATE ──────────────────────────────────────────────────
+let state = {
+    values: [3, 9, 27, 81, 243, 729, 2187, 6561, 19683],
+    axis3: [],
+    axis9: [],
+    axis27: [],
+    axis81: [],
+    pipeline21: [],
+    life360: [],
+    blitz21: [],
+    graviton: {},
+    shadow: null,
+    aluf: null,
+    evo: null,
+    nirwana: null,
+    narrativ: [],
+    impulse: 0,
+    selected: 'hall'
+};
+
+// ─── MODUL‑MAP ──────────────────────────────────────────────
+const modules = {
+    hall: { title: '🏛️ HALLE', file: 'hall.html' },
+    bewegung: { title: '⚡ BEWEGUNG', file: 'bewegung.html' },
+    licht: { title: '☀️ LICHT', file: 'licht.html' },
+    lacht: { title: '😄 LACHT', file: 'lacht.html' },
+    quick: { title: '⚡ QUICK', file: 'quick.html' },
+    mona: { title: '🖼️ MONA LISA', file: 'mona.html' },
+    sensation: { title: '🌀 SEN·SA·TION', file: 'sensation.html' },
+    pover: { title: '⚡ POVER‑ENERGIE', file: 'pover.html' },
+    aluf: { title: '🌌 ALUF', file: 'aluf.html' }
+};
+
+// ─── IMPULS · RUN ───────────────────────────────────────────
+function runImpuls() {
+    state.impulse++;
+
+    // Aktuelle Werte aus der Grid-Auswahl
+    const activeItems = grid.querySelectorAll('.grid-item.active');
+    let values = [];
+    if (activeItems.length > 0) {
+        activeItems.forEach(item => {
+            const idx = parseInt(item.dataset.idx) || 0;
+            values.push(state.values[idx % state.values.length]);
+        });
+    } else {
+        values = state.values;
+    }
+
+    try {
+        const result = UNIEngine.RUN('impuls_' + state.impulse, values);
+        state = {
+            ...state,
+            values: values,
+            axis3: result.axis3,
+            axis9: result.axis9,
+            axis27: result.axis27,
+            axis81: result.axis81,
+            pipeline21: result.pipeline21,
+            life360: result.life360,
+            blitz21: result.blitz21,
+            graviton: result.graviton,
+            shadow: result.shadow
+        };
+
+        // ALUF
+        state.aluf = ALUF.exit('INDEX');
+
+        // EVO
+        state.evo = EVOTAAL.solve(values);
+
+        // NIRWANA
+        state.nirwana = NIRWANA.RUN(values);
+
+        // PULSE aktivieren
+        pulse.classList.add('active');
+
+        // Status
+        status.innerHTML = `
+            <span class="pulse-indicator active"></span>
+            ⚡ IMPULS ${state.impulse} ·
+            <span class="value">${values.length}</span> Werte ·
+            A3: <span class="value">${result.axis3.length}</span> ·
+            A9: <span class="value">${result.axis9.length}</span> ·
+            A27: <span class="value">${result.axis27?.length || 0}</span> ·
+            A81: <span class="value">${result.axis81?.length || 0}</span>
+            ${state.evo?.solved ? ' · ✅ EVO' : ''}
+            ${state.nirwana?.state === 'ACTIVE' ? ' · 🌀 NIRWANA' : ''}
+            ${state.selected ? ' · 🎯 ' + modules[state.selected]?.title : ''}
+        `;
+
+        // Log
+        log.innerHTML = `
+            <span class="key">📊 IMPULS ${state.impulse}</span>
+            <span class="str"> · AXIS3: [${result.axis3.join(', ')}]</span>
+            <span class="str"> · AXIS9: [${result.axis9.slice(0, 5).map(a => a.value).join(', ')}...]</span>
+            <span class="str"> · GRAV: ${result.graviton?.USED || 0}/${result.graviton?.RAW || 0}</span>
+            <span class="str"> · SCHWINGUNG: ATOMAR</span>
+            ${state.narrativ.length > 0 ? '\n<span class="key">📖 NARRATIV: </span><span class="str">' + state.narrativ.join(' · ') + '</span>' : ''}
+        `;
+
+    } catch (e) {
+        status.innerHTML = `❌ FEHLER: ${e.message}`;
+        log.textContent = `ERROR: ${e.message}`;
+        console.error(e);
+    }
+}
+
+// ─── RESET ──────────────────────────────────────────────────
+function resetSystem() {
+    state = {
+        ...state,
+        values: [3, 9, 27, 81, 243, 729, 2187, 6561, 19683],
+        axis3: [],
+        axis9: [],
+        axis27: [],
+        axis81: [],
+        pipeline21: [],
+        life360: [],
+        blitz21: [],
+        graviton: {},
+        shadow: null,
+        aluf: null,
+        evo: null,
+        nirwana: null,
+        narrativ: [],
+        impulse: 0
+    };
+    pulse.classList.remove('active');
+    grid.querySelectorAll('.grid-item').forEach(item => item.classList.remove('active'));
+    status.innerHTML = `
+        <span class="pulse-indicator"></span>
+        ⟲ RESET · <span class="highlight">SYSTEM BEREIT</span>
+    `;
+    log.textContent = '⟲ Reset durchgeführt. Bereit für neuen Impuls.';
+}
+
+// ─── NARRATIV ────────────────────────────────────────────────
+function toggleNarrativ() {
+    const narrativs = [
+        'Solar ist negativ → Rückzug',
+        'Energie ist positiv → Ausdehnung',
+        'Gravitation bindet → 33%',
+        'Schwingung ist atomar → Leben',
+        'ALUF ist offen → Freiheit',
+        'SEN·SA·TION erwacht → Meisterwerk',
+        'POVER‑ENERGIE fließt → Transformation'
+    ];
+
+    if (state.narrativ.length > 0) {
+        state.narrativ = [];
+        status.innerHTML = '📖 NARRATIV <span class="highlight">beendet</span>';
+    } else {
+        state.narrativ = narrativs;
+        status.innerHTML = `📖 NARRATIV aktiv · <span class="highlight">${state.narrativ.length}</span> Impulse`;
+    }
+    runImpuls();
+}
+
+// ─── ALGORITHMIEREN ──────────────────────────────────────────
+function algorithmieren() {
+    // Neue Werte aus der UNI-Engine generieren
+    const base = [3, 9, 27, 81, 243, 729, 2187, 6561, 19683];
+    const shuffled = [...base].sort(() => Math.random() - 0.5);
+    const newValues = shuffled.slice(0, 6 + Math.floor(Math.random() * 3));
+
+    state.values = newValues;
+    status.innerHTML = `🧠 ALGORITHMIEREN · <span class="value">${newValues.length}</span> neue Werte · [${newValues.join(', ')}]`;
+    runImpuls();
+}
+
+// ─── GRID · SELECT ──────────────────────────────────────────
+grid.addEventListener('click', (e) => {
+    const item = e.target.closest('.grid-item');
+    if (!item) return;
+
+    const module = item.dataset.module;
+    if (module && modules[module]) {
+        // Toggle
+        const wasActive = item.classList.contains('active');
+        grid.querySelectorAll('.grid-item').forEach(el => el.classList.remove('active'));
+        if (!wasActive) {
+            item.classList.add('active');
+            state.selected = module;
+            status.innerHTML = `🎯 Modul: <span class="highlight">${modules[module].title}</span> · Ziel: ${modules[module].file}`;
+        } else {
+            state.selected = 'hall';
+            status.innerHTML = `🎯 Modul: <span class="highlight">HALLE</span> · Ziel: hall.html`;
+        }
+        runImpuls();
+    }
+});
+
+// ─── EVENTS ──────────────────────────────────────────────────
+btnRun.addEventListener('click', runImpuls);
+btnReset.addEventListener('click', resetSystem);
+btnNarrativ.addEventListener('click', toggleNarrativ);
+btnAlgo.addEventListener('click', algorithmieren);
+
+// ─── AUTO‑START ─────────────────────────────────────────────
+setTimeout(() => {
+    runImpuls();
+    setTimeout(() => {
+        status.innerHTML = `🚀 INDEX · VERNARRATIVIERT · <span class="highlight">SYSTEM LIEF</span> · IMPULS ${state.impulse}`;
+    }, 300);
+}, 300);
+
+console.log('📖 INDEX · VERNARRATIVIERT geladen');
+console.log('🎯 Module:', Object.keys(modules));
+console.log('📦 ROOT:', ROOT);
+</script>
+</body>
+</html>
