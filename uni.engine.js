@@ -2,8 +2,41 @@
 // Transport · Rotation · Pipelineblitz · FeuerIce · 360°
 // arbeitet kohärent mit Algorithmik.RUN()
 
+// ─── ALUF · Schwingung / Solar / Energie / Gravitation ───────
+
+function swing(solar, energy, grav) {
+  return (solar * -1) + (energy * +1) + grav;
+}
+
+const SOLAR = -1;     // Solar immer negativ
+const ENERGY = +1;    // Energie immer positiv
+
+function grav(value) {
+  return Math.abs(value) * 0.33; // 33% atomare Bindung
+}
+
+export const Schwingung = {
+  calc(value) {
+    const solar = value * SOLAR;
+    const energy = value * ENERGY;
+    const gravitation = grav(value);
+
+    return {
+      raw: value,
+      solar,
+      energy,
+      gravitation,
+      swing: swing(solar, energy, gravitation)
+    };
+  }
+};
+
+// ─── IMPORTS ──────────────────────────────────────────────────
+
 import { Algorithmik } from "./algorithmik.js";
 import { CacheDriver } from "./cache.driver.js";
+
+// ─── UNI-ENGINE ───────────────────────────────────────────────
 
 export const UNIEngine = {
 
@@ -35,7 +68,8 @@ export const UNIEngine = {
       ...a,
       fire: a.vector >= 0,
       ice: a.vector < 0,
-      pulse: Math.abs(a.vector)
+      pulse: Math.abs(a.vector),
+      swing: Schwingung.calc(a.value).swing   // NEU: atomare Schwingung
     }));
   },
 
@@ -62,5 +96,25 @@ export const UNIEngine = {
     this.shadow = CacheDriver.respond(key);
   },
 
-  // 6) RUN · Vollausführung
-  RUN(key, values
+  // 6) RUN · Vollausführung (DEIN FEHLENDER BLOCK)
+  RUN(key, values) {
+    this.init(values);
+    this.core(values);
+    this.blitz();
+    this.graviton();
+    this.cache(key);
+
+    return {
+      axis3: this.axis3,
+      axis9: this.axis9,
+      axis27: this.axis27,
+      axis81: this.axis81,
+      pipeline21: this.pipeline21,
+      blitz21: this.blitz21,
+      graviton: this.RAM,
+      sorted: this.SORTED,
+      shadow: this.shadow,
+      life360: this.life360
+    };
+  }
+};
