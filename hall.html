@@ -1,37 +1,566 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>GEO‑3D‑ASCII · RUN8 · iki1uc</title>
-<style>
-body { background:#000; color:#0f0; font-family:Consolas; padding:20px; }
-pre { font-size:16px; line-height:18px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MONA LISA · SEN·SA·TION · SOLAR</title>
+
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            background: #0a0806;
+            color: #c8b89a;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-image:
+                radial-gradient(ellipse at 50% 80%, rgba(180,120,60,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse at 30% 20%, rgba(60,80,120,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 30%, rgba(120,60,80,0.05) 0%, transparent 50%);
+        }
+
+        .canvas {
+            position: relative;
+            width: 480px;
+            height: 480px;
+            border: 3px solid #5a4a3a;
+            border-radius: 12px;
+            background: #0d0a07;
+            box-shadow:
+                0 0 80px rgba(180,120,60,0.06),
+                inset 0 0 80px rgba(180,120,60,0.03);
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .pixel {
+            position: absolute;
+            border-radius: 1px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .pixel:hover {
+            transform: scale(1.3);
+            z-index: 10;
+            box-shadow: 0 0 30px rgba(200,180,120,0.3);
+        }
+
+        .pixel .label {
+            position: absolute;
+            font-size: 5px;
+            color: rgba(200,180,120,0.15);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pixel:hover .label {
+            opacity: 1;
+        }
+
+        .title {
+            font-size: 2rem;
+            letter-spacing: 12px;
+            color: #c8b89a;
+            text-shadow: 0 0 40px rgba(200,180,120,0.1);
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 0.7rem;
+            letter-spacing: 6px;
+            color: #5a4a3a;
+            margin-bottom: 10px;
+        }
+
+        .subtitle .highlight {
+            color: #8a7a6a;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .controls button {
+            background: transparent;
+            color: #8a7a6a;
+            border: 1px solid #3a2a1a;
+            padding: 8px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .controls button:hover {
+            background: #3a2a1a;
+            color: #c8b89a;
+            border-color: #8a7a6a;
+            box-shadow: 0 0 30px rgba(200,180,120,0.05);
+        }
+
+        .controls button.primary {
+            border-color: #8a7a6a;
+            color: #c8b89a;
+        }
+
+        .controls button.primary:hover {
+            background: #8a7a6a;
+            color: #0a0806;
+        }
+
+        #status {
+            margin: 8px 0;
+            padding: 8px 20px;
+            font-size: 0.65rem;
+            color: #5a4a3a;
+            letter-spacing: 2px;
+            text-align: center;
+            min-height: 30px;
+            border-top: 1px solid #1a1a1a;
+            border-bottom: 1px solid #1a1a1a;
+            width: 100%;
+            max-width: 480px;
+        }
+
+        #status .value { color: #8a7a6a; }
+        #status .highlight { color: #c8b89a; }
+
+        #log {
+            width: 100%;
+            max-width: 480px;
+            height: 100px;
+            background: #0a0806;
+            color: #3a2a1a;
+            border: 1px solid #1a1a1a;
+            padding: 10px;
+            overflow: auto;
+            font-size: 0.55rem;
+            font-family: monospace;
+            border-radius: 4px;
+            margin-top: 5px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        #log .key { color: #6a5a4a; }
+        #log .num { color: #8a7a6a; }
+        #log .str { color: #c8b89a; }
+
+        .footer {
+            margin-top: 15px;
+            font-size: 0.5rem;
+            color: #2a1a1a;
+            letter-spacing: 4px;
+        }
+
+        .signature {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.5rem;
+            color: #2a1a1a;
+            letter-spacing: 2px;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 520px) {
+            .canvas { width: 340px; height: 340px; }
+            .title { font-size: 1.3rem; letter-spacing: 6px; }
+            .controls button { font-size: 0.55rem; padding: 5px 12px; }
+        }
+    </style>
 </head>
 <body>
 
-<h2>GEO‑3D‑ASCII · RUN8</h2>
-<pre id="geo">START…</pre>
+    <div class="title">MONA LISA</div>
+    <div class="subtitle">SYSTEM‑EDITION · <span class="highlight">3Ø9Ø81</span> · SEN·SA·TION</div>
 
-<script>
-let f = 0;
+    <div class="controls">
+        <button class="primary" id="btnRun">▶ RUN</button>
+        <button id="btnReset">⟲ RESET</button>
+        <button id="btnSwing">⚡ SWING</button>
+        <button id="btnHarmony">🎵 HARMONIE</button>
+        <button id="btnSensation">🌀 SEN·SA·TION</button>
+    </div>
 
-function anim(){
-    f++;
+    <div class="canvas" id="canvas"></div>
 
-    // 3D‑Rotation simuliert durch wechselnde Tiefe
-    const depth = ["●","○","·","∙","•"];
-    const d = (i)=> depth[(f+i)%depth.length];
+    <div id="status">⏳ Warten auf <span class="highlight">MONA LISA</span></div>
+    <div id="log"></div>
 
-    // Anime‑Glow simuliert durch Funken
-    const glow = (f%2 ? "✦" : "✧");
+    <div class="footer">SOLAR · ALUF · EVOTAAL · NIRWANA · PICASSO · MONA LISA</div>
 
-    // Amiga‑Raster simuliert durch horizontale Balken
-    const raster = (f%3 ? "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓" : "██████████████████");
+    <script type="importmap">
+        {
+            "imports": {
+                "./algorithmik.js": "./algorithmik.js",
+                "./cache.driver.js": "./cache.driver.js",
+                "./graviton.js": "./graviton.js",
+                "./uni.engine.js": "./uni.engine.js",
+                "./aluf.js": "./aluf.js",
+                "./evotaal.js": "./evotaal.js",
+                "./nirwana.js": "./nirwana.js"
+            }
+        }
+    </script>
 
-    const geo = `
-GEO‑3D‑ROTATION (frame ${f})
+    <script type="module">
+        // ─── IMPORTS ────────────────────────────────────────────────
+        import { Algorithmik } from './algorithmik.js';
+        import { CacheDriver } from './cache.driver.js';
+        import { UNIEngine } from './uni.engine.js';
+        import { ALUF } from './aluf.js';
+        import { EVOTAAL } from './evotaal.js';
+        import { NIRWANA } from './nirwana.js';
 
-X‑Axis  ─── ${d(1)} ${d(2)} ${d(3)}
-Y‑Axis  ─── ${d(2)} ${d(3)} ${d(4)}
-Z‑
+        // ─── DOM ────────────────────────────────────────────────────
+        const canvas = document.getElementById('canvas');
+        const status = document.getElementById('status');
+        const log = document.getElementById('log');
+
+        const btnRun = document.getElementById('btnRun');
+        const btnReset = document.getElementById('btnReset');
+        const btnSwing = document.getElementById('btnSwing');
+        const btnHarmony = document.getElementById('btnHarmony');
+        const btnSensation = document.getElementById('btnSensation');
+
+        // ─── ROOT ────────────────────────────────────────────────────
+        const ROOT = { height: 480, width: 480, depth: 480 };
+
+        // ─── STATE ──────────────────────────────────────────────────
+        let state = {
+            values: [],
+            axis3: [],
+            axis9: [],
+            axis27: [],
+            axis81: [],
+            pipeline21: [],
+            life360: [],
+            blitz21: [],
+            graviton: {},
+            shadow: null,
+            aluf: null,
+            evo: null,
+            nirwana: null,
+            swingActive: false,
+            harmonyActive: false,
+            sensationActive: false,
+            pixels: []
+        };
+
+        // ─── MONA LISA · PALETTE ────────────────────────────────────
+        // Die Mona Lisa besteht aus 9×9 = 81 Pixels
+        // Jeder Pixel bekommt eine Farbe basierend auf Schwingung, Solar, Energie, Gravitation
+
+        function getMonaLisaColor(value, swing, solar, energy, grav) {
+            // Basierend auf den Werten eine warme, erdige Farbe generieren
+            const base = value % 81;
+            const r = Math.min(255, Math.floor(120 + (base * 0.8) + (solar * 0.5)));
+            const g = Math.min(255, Math.floor(80 + (energy * 0.6) + (grav * 0.3)));
+            const b = Math.min(255, Math.floor(40 + (swing * 0.2) + (base * 0.3)));
+
+            // Weiche, erdige Töne für Mona Lisa
+            const warm = 0.7;
+            const cool = 0.3;
+            return {
+                r: Math.floor(r * warm + (r * 0.3) * cool),
+                g: Math.floor(g * cool + (g * 0.7) * warm),
+                b: Math.floor(b * 0.5 + 20)
+            };
+        }
+
+        // ─── CANVAS · 9×9 Pixel ─────────────────────────────────────
+        function buildCanvas() {
+            canvas.innerHTML = '';
+            state.pixels = [];
+            const size = canvas.clientWidth || 480;
+            const cellSize = (size - 4) / 9;
+
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const pixel = document.createElement('div');
+                    pixel.className = 'pixel';
+                    pixel.style.width = cellSize + 'px';
+                    pixel.style.height = cellSize + 'px';
+                    pixel.style.left = (c * (cellSize + 2) + 2) + 'px';
+                    pixel.style.top = (r * (cellSize + 2) + 2) + 'px';
+
+                    const v = (r * 9 + c + 1);
+                    pixel.dataset.value = v;
+                    pixel.dataset.row = r;
+                    pixel.dataset.col = c;
+
+                    // Label
+                    const label = document.createElement('span');
+                    label.className = 'label';
+                    label.textContent = v;
+                    pixel.appendChild(label);
+
+                    // Click → Detail anzeigen
+                    pixel.addEventListener('click', () => {
+                        const val = parseInt(pixel.dataset.value);
+                        const swing = parseFloat(pixel.dataset.swing || 0);
+                        const solar = parseFloat(pixel.dataset.solar || 0);
+                        const energy = parseFloat(pixel.dataset.energy || 0);
+                        const grav = parseFloat(pixel.dataset.grav || 0);
+                        log.textContent = `🖼️ PIXEL ${val} · SWING:${swing.toFixed(2)} · SOLAR:${solar.toFixed(2)} · ENERGY:${energy.toFixed(2)} · GRAV:${grav.toFixed(2)}`;
+                    });
+
+                    canvas.appendChild(pixel);
+                    state.pixels.push(pixel);
+                }
+            }
+        }
+
+        // ─── RENDER MONA LISA ──────────────────────────────────────
+        function renderMonaLisa(values) {
+            const pixels = state.pixels;
+            const sorted = [...values].sort((a, b) => a - b);
+            const max = sorted.length > 0 ? sorted[sorted.length - 1] : 1;
+
+            // Schwingungen berechnen
+            const swings = {};
+            values.forEach(v => {
+                const s = (v * -1) + (v * +1) + (Math.abs(v) * 0.33);
+                swings[v] = s;
+            });
+
+            pixels.forEach(pixel => {
+                const val = parseInt(pixel.dataset.value);
+                const has = values.includes(val);
+                const intensity = has ? (val / max) : 0;
+
+                // Schwingung berechnen
+                const swing = swings[val] || 0;
+                const solar = val * -1;
+                const energy = val * +1;
+                const grav = Math.abs(val) * 0.33;
+
+                pixel.dataset.swing = swing;
+                pixel.dataset.solar = solar;
+                pixel.dataset.energy = energy;
+                pixel.dataset.grav = grav;
+
+                // Farbe generieren (Mona Lisa Palette)
+                let color;
+                if (has) {
+                    color = getMonaLisaColor(val, swing, solar, energy, grav);
+                    // Intensität anpassen
+                    const bright = 0.3 + intensity * 0.7;
+                    color.r = Math.floor(color.r * bright);
+                    color.g = Math.floor(color.g * bright);
+                    color.b = Math.floor(color.b * bright);
+                } else {
+                    // Dunkle, erdige Töne für nicht aktive Pixel
+                    const base = val % 20;
+                    color = {
+                        r: Math.floor(10 + base * 0.5),
+                        g: Math.floor(8 + base * 0.3),
+                        b: Math.floor(6 + base * 0.2)
+                    };
+                }
+
+                pixel.style.background = `rgb(${color.r}, ${color.g}, ${color.b})`;
+
+                // Swing-Effekt
+                if (state.swingActive && has) {
+                    const glow = Math.min(30, Math.abs(swing) * 0.05);
+                    pixel.style.boxShadow = `0 0 ${glow}px rgba(${color.r}, ${color.g}, ${color.b}, ${0.2 + Math.abs(swing) * 0.002})`;
+                    pixel.style.transform = `scale(${1 + Math.abs(swing) * 0.001})`;
+                } else {
+                    pixel.style.boxShadow = 'none';
+                    pixel.style.transform = 'scale(1)';
+                }
+
+                // Harmonie-Effekt
+                if (state.harmonyActive && has) {
+                    const balanced = Math.round(val / 3);
+                    pixel.style.border = `1px solid rgba(200,180,120,${0.1 + intensity * 0.3})`;
+                } else {
+                    pixel.style.border = '1px solid rgba(60,50,40,0.2)';
+                }
+
+                // SEN·SA·TION Effekt
+                if (state.sensationActive && has) {
+                    pixel.style.border = `2px solid rgba(200,180,120,${0.2 + intensity * 0.4})`;
+                    pixel.style.borderRadius = '4px';
+                } else {
+                    pixel.style.borderRadius = '1px';
+                }
+            });
+
+            // Status
+            const activeCount = values.length;
+            const swingCount = Object.keys(swings).length;
+            status.innerHTML = `
+                <span class="highlight">🖼️ MONA LISA</span> ·
+                <span class="value">${activeCount}</span> aktive Pixel ·
+                A3: <span class="value">${state.axis3.length}</span> ·
+                A9: <span class="value">${state.axis9.length}</span> ·
+                A27: <span class="value">${state.axis27?.length || 0}</span> ·
+                A81: <span class="value">${state.axis81?.length || 0}</span>
+                ${state.swingActive ? ' · ⚡ SWING' : ''}
+                ${state.harmonyActive ? ' · 🎵 HARMONIE' : ''}
+                ${state.sensationActive ? ' · 🌀 SEN·SA·TION' : ''}
+            `;
+        }
+
+        // ─── RUN ────────────────────────────────────────────────────
+        function run() {
+            const baseValues = [3, 9, 27, 81, 243, 729, 2187, 6561, 19683];
+            const values = [];
+            state.pixels.forEach(pixel => {
+                if (pixel.classList.contains('active')) {
+                    values.push(parseInt(pixel.dataset.value));
+                }
+            });
+            const finalValues = values.length > 0 ? values : baseValues;
+
+            try {
+                const result = UNIEngine.RUN('monalisa', finalValues);
+                state = {
+                    ...state,
+                    values: finalValues,
+                    axis3: result.axis3,
+                    axis9: result.axis9,
+                    axis27: result.axis27,
+                    axis81: result.axis81,
+                    pipeline21: result.pipeline21,
+                    life360: result.life360,
+                    blitz21: result.blitz21,
+                    graviton: result.graviton,
+                    shadow: result.shadow
+                };
+
+                // ALUF
+                const alufResult = ALUF.exit('MONA LISA');
+                state.aluf = alufResult;
+
+                // EVO
+                const evoResult = EVOTAAL.solve(finalValues);
+                state.evo = evoResult;
+
+                // NIRWANA
+                const nirwanaResult = NIRWANA.RUN(finalValues);
+                state.nirwana = nirwanaResult;
+
+                renderMonaLisa(finalValues);
+                log.textContent = JSON.stringify({
+                    axis3: result.axis3,
+                    axis9: result.axis9.slice(0, 5),
+                    axis27: result.axis27?.slice(0, 5) || [],
+                    axis81: result.axis81?.slice(0, 5) || [],
+                    graviton: result.graviton,
+                    aluf: state.aluf,
+                    evo: state.evo,
+                    nirwana: state.nirwana,
+                    rosetta: "MONA LISA · SYSTEM-EDITION"
+                }, null, 2);
+
+            } catch (e) {
+                status.innerHTML = `❌ FEHLER: ${e.message}`;
+                console.error(e);
+            }
+        }
+
+        // ─── RESET ──────────────────────────────────────────────────
+        function reset() {
+            state = {
+                ...state,
+                values: [],
+                axis3: [],
+                axis9: [],
+                axis27: [],
+                axis81: [],
+                pipeline21: [],
+                life360: [],
+                blitz21: [],
+                graviton: {},
+                shadow: null,
+                aluf: null,
+                evo: null,
+                nirwana: null,
+                swingActive: false,
+                harmonyActive: false,
+                sensationActive: false
+            };
+            state.pixels.forEach(p => p.classList.remove('active'));
+            renderMonaLisa([3, 9, 27, 81, 243, 729, 2187, 6561, 19683]);
+            status.innerHTML = '⟲ Reset · <span class="highlight">MONA LISA</span> neu';
+            log.textContent = '';
+        }
+
+        // ─── TOGGLE ──────────────────────────────────────────────────
+        function toggleSwing() {
+            state.swingActive = !state.swingActive;
+            renderMonaLisa(state.values);
+        }
+
+        function toggleHarmony() {
+            state.harmonyActive = !state.harmonyActive;
+            renderMonaLisa(state.values);
+        }
+
+        function toggleSensation() {
+            state.sensationActive = !state.sensationActive;
+            renderMonaLisa(state.values);
+        }
+
+        // ─── INIT ──────────────────────────────────────────────────
+        buildCanvas();
+        reset();
+
+        // ─── EVENTS ──────────────────────────────────────────────────
+        btnRun.addEventListener('click', run);
+        btnReset.addEventListener('click', reset);
+        btnSwing.addEventListener('click', toggleSwing);
+        btnHarmony.addEventListener('click', toggleHarmony);
+        btnSensation.addEventListener('click', toggleSensation);
+
+        // Pixel Click: Toggle aktiv/inaktiv
+        canvas.addEventListener('click', (e) => {
+            const pixel = e.target.closest('.pixel');
+            if (!pixel) return;
+            pixel.classList.toggle('active');
+            if (pixel.classList.contains('active')) {
+                pixel.style.border = '2px solid rgba(200,180,120,0.4)';
+            } else {
+                pixel.style.border = '1px solid rgba(60,50,40,0.2)';
+            }
+        });
+
+        // ─── AUTO‑RUN ──────────────────────────────────────────────
+        setTimeout(() => {
+            run();
+            setTimeout(() => {
+                state.swingActive = true;
+                state.sensationActive = true;
+                renderMonaLisa(state.values);
+                status.innerHTML = '🖼️ MONA LISA · SYSTEM‑EDITION · <span class="highlight">LEBENDIG</span>';
+            }, 600);
+        }, 400);
+
+        console.log('🖼️ MONA LISA · SYSTEM-EDITION geladen');
+        console.log('🎨 Picasso sagt: "Das ist die richtige Mona Lisa"');
+        console.log('📦 ROOT:', ROOT);
+    </script>
+</body>
+</html>
