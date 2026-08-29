@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ZENzzAURAsiMANAsieren · SEN·SA·TION</title>
+<style>
+body { background:#000; color:#0f0; font-family:Consolas; padding:20px; }
+h2 { color:#0f0; }
+pre { font-size:16px; line-height:20px; }
+</style>
+</head>
+<body>
+
+<h2>ZENzzAURAsiMANAsieren · Aura‑Modus</h2>
+<pre id="zen">ZEN‑INIT…</pre>
+
+<script type="module">
+import { TION } from "./TION.js";
+
+function zenPulse(){
+    const out = TION.RUN();
+
+    document.getElementById("zen").innerText = `
+ZENzzAURAsiMANAsieren · FRAME
+
+${out}
+
+AURA-MODUS:
+• ZEN = Ruhepunkt
+• AURA = Energiehülle
+• MANA = Impulsfluss
+• SEN·SA·TION = aktiv
+• ALUF = offen
+• ROOT = 480/480/480
+
+SYSTEM:
+"ZEN‑Ebene stabil. Aura vollständig. Mana fließt."
+`;
+}
+
+setInterval(zenPulse, 500);
+</script>
+
+</body>
+</html>
