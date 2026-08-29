@@ -1,1 +1,681 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MULTIVERSUM · GRELL · iki1uc · SOLAR</title>
 
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: #0a0806;
+            color: #c8b89a;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 15px;
+        }
+
+        .multiversum {
+            max-width: 920px;
+            width: 100%;
+            background: #0d0a07;
+            border: 1px solid #3a2a1a;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 0 100px rgba(200,180,120,0.04), inset 0 0 100px rgba(200,180,120,0.01);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            letter-spacing: 16px;
+            color: #c8b89a;
+            text-align: center;
+            font-weight: 300;
+            border-bottom: 1px solid #2a1a1a;
+            padding-bottom: 15px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 60px rgba(200,180,120,0.05);
+        }
+
+        h1 .grell { color: #e8d8b8; text-shadow: 0 0 80px rgba(200,180,120,0.15); }
+        h1 .iki1uc { color: #5a4a3a; font-size: 1.2rem; letter-spacing: 6px; }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #5a4a3a;
+            letter-spacing: 8px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .subtitle .universum { color: #8a7a6a; }
+        .subtitle .grell { color: #c8b89a; }
+
+        #cube {
+            width: 100%;
+            max-width: 480px;
+            aspect-ratio: 1/1;
+            margin: 12px auto;
+            position: relative;
+            background: #060504;
+            border: 1px solid #2a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 60px rgba(200,180,120,0.03);
+        }
+
+        .pixel {
+            position: absolute;
+            border-radius: 1px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .pixel:hover {
+            transform: scale(1.25);
+            z-index: 10;
+            box-shadow: 0 0 40px rgba(200,180,120,0.2);
+        }
+
+        .pixel .label {
+            position: absolute;
+            font-size: 5px;
+            color: rgba(200,180,120,0.12);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pixel:hover .label { opacity: 1; }
+
+        #status {
+            margin: 10px 0;
+            padding: 10px 15px;
+            font-size: 0.6rem;
+            color: #5a4a3a;
+            letter-spacing: 2px;
+            text-align: center;
+            border-top: 1px solid #1a1a1a;
+            border-bottom: 1px solid #1a1a1a;
+            min-height: 40px;
+            line-height: 1.8;
+        }
+
+        #status .value { color: #8a7a6a; }
+        #status .highlight { color: #c8b89a; }
+        #status .grell { color: #e8d8b8; }
+        #status .ok { color: #6a8a6a; }
+        #status .max { color: #c8b89a; }
+        #status .min { color: #5a4a3a; }
+
+        #log {
+            width: 100%;
+            height: 100px;
+            background: #060504;
+            color: #3a2a1a;
+            border: 1px solid #1a1a1a;
+            padding: 10px;
+            overflow: auto;
+            font-size: 0.5rem;
+            font-family: monospace;
+            border-radius: 4px;
+            margin: 8px 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        #log .key { color: #6a5a4a; }
+        #log .num { color: #8a7a6a; }
+        #log .str { color: #c8b89a; }
+        #log .grell { color: #e8d8b8; }
+
+        .controls {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .controls button {
+            background: transparent;
+            color: #5a4a3a;
+            border: 1px solid #1a1a1a;
+            padding: 6px 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .controls button:hover {
+            background: #1a1a1a;
+            color: #c8b89a;
+            border-color: #5a4a3a;
+        }
+
+        .controls button.primary {
+            border-color: #5a4a3a;
+            color: #8a7a6a;
+        }
+
+        .controls button.primary:hover {
+            background: #5a4a3a;
+            color: #0a0806;
+        }
+
+        .controls button.grell {
+            border-color: #8a7a6a;
+            color: #c8b89a;
+        }
+
+        .controls button.grell:hover {
+            background: #8a7a6a;
+            color: #0a0806;
+            box-shadow: 0 0 40px rgba(200,180,120,0.1);
+        }
+
+        .controls button.station {
+            border-color: #3a2a1a;
+            color: #5a4a3a;
+        }
+
+        .controls button.station:hover {
+            background: #3a2a1a;
+            color: #c8b89a;
+        }
+
+        .station-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 4px;
+            margin: 8px 0;
+        }
+
+        .station-grid .station-item {
+            background: #0a0806;
+            border: 1px solid #1a1a1a;
+            border-radius: 4px;
+            padding: 6px 2px;
+            text-align: center;
+            font-size: 0.45rem;
+            color: #3a2a1a;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .station-grid .station-item:hover {
+            border-color: #5a4a3a;
+            color: #8a7a6a;
+            background: #0d0a07;
+        }
+
+        .station-grid .station-item.active {
+            border-color: #8a7a6a;
+            color: #c8b89a;
+            background: #0d0a07;
+        }
+
+        .footer {
+            margin-top: 10px;
+            font-size: 0.4rem;
+            color: #1a1a1a;
+            letter-spacing: 4px;
+            text-align: center;
+        }
+
+        .footer .iki1uc { color: #2a2a2a; }
+        .footer .grell { color: #3a2a1a; }
+
+        .pulse-indicator {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #3a2a1a;
+            margin-right: 6px;
+            transition: all 0.3s;
+        }
+
+        .pulse-indicator.active {
+            background: #c8b89a;
+            box-shadow: 0 0 30px rgba(200,180,120,0.2);
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @media (max-width: 600px) {
+            .multiversum { padding: 15px; }
+            h1 { font-size: 1.6rem; letter-spacing: 8px; }
+            h1 .iki1uc { font-size: 0.8rem; }
+            .station-grid { grid-template-columns: repeat(6, 1fr); }
+            .controls button { font-size: 0.4rem; padding: 4px 8px; }
+        }
+
+        @media (max-width: 400px) {
+            .station-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="multiversum">
+    <h1>
+        MULTIVERSUM
+        <span class="grell">· GRELL</span>
+        <br>
+        <span class="iki1uc">iki1uc</span>
+    </h1>
+    <div class="subtitle">
+        <span class="universum">UNIVERSUM</span> · <span class="grell">GRELL</span> · 3Ø9Ø81 · SEN·SA·TION
+    </div>
+
+    <div id="cube"></div>
+
+    <div id="status">
+        <span class="pulse-indicator" id="pulse"></span>
+        ⏳ MULTIVERSUM · <span class="grell">GRELL</span> · <span class="highlight">OFFEN</span>
+    </div>
+
+    <div class="controls">
+        <button class="primary" id="btnRun">▶ RUN</button>
+        <button id="btnReset">⟲ RESET</button>
+        <button class="grell" id="btnGrell">✨ GRELL</button>
+        <button class="station" id="btnMax">⬆ MAX</button>
+        <button class="station" id="btnMin">⬇ MIN</button>
+        <button class="station" id="btnStations">🎯 STATIONEN</button>
+        <button class="station" id="btnRespo">🌀 RESPO</button>
+    </div>
+
+    <div class="station-grid" id="stationGrid">
+        <div class="station-item active" data-station="d">D</div>
+        <div class="station-item" data-station="e">E</div>
+        <div class="station-item" data-station="i">I</div>
+        <div class="station-item" data-station="n">N</div>
+        <div class="station-item" data-station="o">O</div>
+        <div class="station-item" data-station="r">R</div>
+        <div class="station-item" data-station="s">S</div>
+        <div class="station-item" data-station="u">U</div>
+        <div class="station-item" data-station="w">W</div>
+    </div>
+
+    <div id="log">⏳ MULTIVERSUM · GRELL · WARTET</div>
+
+    <div class="footer">SOLAR · ALUF · EVOTAAL · NIRWANA · SEN·SA·TION · <span class="iki1uc">iki1uc</span> · <span class="grell">GRELL</span></div>
+</div>
+
+<script type="importmap">
+{
+    "imports": {
+        "./algorithmik.js": "./algorithmik.js",
+        "./cache.driver.js": "./cache.driver.js",
+        "./graviton.js": "./graviton.js",
+        "./uni.engine.js": "./uni.engine.js",
+        "./aluf.js": "./aluf.js",
+        "./evotaal.js": "./evotaal.js",
+        "./nirwana.js": "./nirwana.js"
+    }
+}
+</script>
+
+<script type="module">
+// ─── IMPORTS ────────────────────────────────────────────────
+import { Algorithmik } from './algorithmik.js';
+import { CacheDriver } from './cache.driver.js';
+import { UNIEngine } from './uni.engine.js';
+import { ALUF } from './aluf.js';
+import { EVOTAAL } from './evotaal.js';
+import { NIRWANA } from './nirwana.js';
+
+// ─── DOM ────────────────────────────────────────────────────
+const cube = document.getElementById('cube');
+const status = document.getElementById('status');
+const log = document.getElementById('log');
+const pulse = document.getElementById('pulse');
+const stationGrid = document.getElementById('stationGrid');
+
+const btnRun = document.getElementById('btnRun');
+const btnReset = document.getElementById('btnReset');
+const btnGrell = document.getElementById('btnGrell');
+const btnMax = document.getElementById('btnMax');
+const btnMin = document.getElementById('btnMin');
+const btnStations = document.getElementById('btnStations');
+const btnRespo = document.getElementById('btnRespo');
+
+// ─── ROOT ────────────────────────────────────────────────────
+const ROOT = { height: 480, width: 480, depth: 480 };
+
+// ─── STATIONEN ──────────────────────────────────────────────
+const STATIONEN = ['d', 'e', 'i', 'n', 'o', 'r', 's', 'u', 'w'];
+
+// ─── STATE ──────────────────────────────────────────────────
+let state = {
+    values: [3, 9, 27, 81, 243, 729, 2187, 6561, 19683],
+    axis3: [],
+    axis9: [],
+    axis27: [],
+    axis81: [],
+    pipeline21: [],
+    life360: [],
+    blitz21: [],
+    graviton: {},
+    shadow: null,
+    aluf: null,
+    evo: null,
+    nirwana: null,
+    grell: false,
+    respo: false,
+    maxMode: false,
+    minMode: false,
+    stationMode: false,
+    activeStation: 'd',
+    pixels: []
+};
+
+// ─── CUBE · 9×9 ─────────────────────────────────────────────
+function buildCube() {
+    cube.innerHTML = '';
+    state.pixels = [];
+    const size = cube.clientWidth || 480;
+    const cellSize = (size - 4) / 9;
+
+    for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            pixel.style.width = cellSize + 'px';
+            pixel.style.height = cellSize + 'px';
+            pixel.style.left = (c * (cellSize + 2) + 2) + 'px';
+            pixel.style.top = (r * (cellSize + 2) + 2) + 'px';
+
+            const v = (r * 9 + c + 1);
+            pixel.dataset.value = v;
+            pixel.dataset.row = r;
+            pixel.dataset.col = c;
+
+            const label = document.createElement('span');
+            label.className = 'label';
+            label.textContent = v;
+            pixel.appendChild(label);
+
+            pixel.addEventListener('click', () => {
+                const val = parseInt(pixel.dataset.value);
+                log.textContent = `🎯 PIXEL ${val} · MAX: ${state.values[state.values.length-1] || val} · MIN: ${state.values[0] || val} · STATION: ${state.activeStation}`;
+            });
+
+            cube.appendChild(pixel);
+            state.pixels.push(pixel);
+        }
+    }
+}
+
+// ─── RENDER ──────────────────────────────────────────────────
+function render(values) {
+    const pixels = state.pixels;
+    const sorted = [...values].sort((a, b) => a - b);
+    const max = sorted.length > 0 ? sorted[sorted.length - 1] : 1;
+    const min = sorted.length > 0 ? sorted[0] : 1;
+
+    pixels.forEach(pixel => {
+        const val = parseInt(pixel.dataset.value);
+        const has = values.includes(val);
+        const intensity = has ? (val / max) : 0;
+
+        if (has) {
+            const bright = Math.floor(50 + intensity * 210);
+            const r = Math.floor(100 + intensity * 140);
+            const g = Math.floor(70 + intensity * 120);
+            const b = Math.floor(30 + intensity * 90);
+
+            // GRELL: intensiver, leuchtender
+            if (state.grell) {
+                const glow = Math.floor(20 + intensity * 60);
+                pixel.style.background = `rgb(${Math.min(255, r + glow)}, ${Math.min(255, g + glow)}, ${Math.min(255, b + glow)})`;
+                pixel.style.boxShadow = `0 0 ${30 + intensity * 50}px rgba(200,180,120,${0.05 + intensity * 0.15})`;
+                pixel.style.border = `1px solid rgba(200,180,120,${0.15 + intensity * 0.4})`;
+            } else {
+                pixel.style.background = `rgb(${r}, ${g}, ${b})`;
+                pixel.style.boxShadow = `0 0 ${10 + intensity * 20}px rgba(200,180,120,${0.02 + intensity * 0.05})`;
+                pixel.style.border = `1px solid rgba(200,180,120,${0.05 + intensity * 0.2})`;
+            }
+
+            pixel.style.opacity = '1';
+
+            // MAX/MIN
+            if (state.maxMode && val === max) {
+                pixel.style.border = '2px solid #e8d8b8';
+                pixel.style.boxShadow = '0 0 50px rgba(200,180,120,0.25)';
+            }
+            if (state.minMode && val === min) {
+                pixel.style.border = '2px solid #5a4a3a';
+                pixel.style.boxShadow = '0 0 50px rgba(90,74,58,0.15)';
+            }
+
+            // RESPO
+            if (state.respo) {
+                pixel.style.borderRadius = '50%';
+                pixel.style.transform = `scale(${0.75 + intensity * 0.35})`;
+            } else {
+                pixel.style.borderRadius = '1px';
+                pixel.style.transform = 'scale(1)';
+            }
+
+            // STATION-Modus: Farbcodierung
+            if (state.stationMode) {
+                const stationColors = {
+                    d: 'rgba(200,180,120,0.1)',
+                    e: 'rgba(200,160,120,0.1)',
+                    i: 'rgba(180,180,120,0.1)',
+                    n: 'rgba(160,180,120,0.1)',
+                    o: 'rgba(140,180,160,0.1)',
+                    r: 'rgba(120,180,180,0.1)',
+                    s: 'rgba(120,160,200,0.1)',
+                    u: 'rgba(140,140,200,0.1)',
+                    w: 'rgba(160,120,200,0.1)'
+                };
+                const color = stationColors[state.activeStation] || 'rgba(200,180,120,0.05)';
+                pixel.style.boxShadow = `0 0 40px ${color}`;
+                pixel.style.border = `1px solid ${color.replace('0.1', '0.3')}`;
+            }
+
+        } else {
+            pixel.style.background = '#060504';
+            pixel.style.opacity = '0.15';
+            pixel.style.border = '1px solid #0a0a0a';
+            pixel.style.boxShadow = 'none';
+            pixel.style.borderRadius = '1px';
+            pixel.style.transform = 'scale(1)';
+        }
+    });
+
+    // Status
+    const activeCount = values.length;
+    status.innerHTML = `
+        <span class="pulse-indicator ${activeCount > 0 ? 'active' : ''}"></span>
+        MULTIVERSUM · <span class="grell">GRELL</span> ·
+        <span class="highlight">${activeCount}</span> Werte ·
+        MAX: <span class="max">${max}</span> ·
+        MIN: <span class="min">${min}</span> ·
+        A3: <span class="value">${state.axis3.length}</span> ·
+        A9: <span class="value">${state.axis9.length}</span> ·
+        A27: <span class="value">${state.axis27?.length || 0}</span> ·
+        A81: <span class="value">${state.axis81?.length || 0}</span>
+        ${state.grell ? ' · ✨ GRELL' : ''}
+        ${state.respo ? ' · 🌀 RESPO' : ''}
+        ${state.stationMode ? ' · 🎯 ' + state.activeStation.toUpperCase() : ''}
+        ${state.maxMode ? ' · ⬆ MAX' : ''}
+        ${state.minMode ? ' · ⬇ MIN' : ''}
+    `;
+}
+
+// ─── RUN ────────────────────────────────────────────────────
+function run() {
+    const values = state.values;
+
+    try {
+        const result = UNIEngine.RUN('multiversum', values);
+        state = {
+            ...state,
+            axis3: result.axis3,
+            axis9: result.axis9,
+            axis27: result.axis27,
+            axis81: result.axis81,
+            pipeline21: result.pipeline21,
+            life360: result.life360,
+            blitz21: result.blitz21,
+            graviton: result.graviton,
+            shadow: result.shadow
+        };
+
+        state.aluf = ALUF.exit('MULTIVERSUM');
+        state.evo = EVOTAAL.solve(values);
+        state.nirwana = NIRWANA.RUN(values);
+
+        render(values);
+
+        log.innerHTML = `
+            <span class="key">🌌 MULTIVERSUM · GRELL</span>
+            <span class="str"> · AXIS3: [${result.axis3.join(', ')}]</span>
+            <span class="str"> · AXIS9: ${result.axis9.length}</span>
+            <span class="str"> · AXIS27: ${result.axis27?.length || 0}</span>
+            <span class="str"> · AXIS81: ${result.axis81?.length || 0}</span>
+            <span class="str"> · GRAV: ${result.graviton?.USED || 0}/${result.graviton?.RAW || 0}</span>
+            <span class="str"> · MAX: ${result.axis3[result.axis3.length-1] || '—'}</span>
+            <span class="str"> · MIN: ${result.axis3[0] || '—'}</span>
+            <span class="grell"> · ✨ GRELL: ${state.grell ? 'AKTIV' : 'INAKTIV'}</span>
+            ${state.evo?.solved ? '\n<span class="key">✅ EVO: </span><span class="str">gelöst</span>' : ''}
+            ${state.nirwana?.state === 'ACTIVE' ? '\n<span class="key">🌀 NIRWANA: </span><span class="str">aktiv</span>' : ''}
+            ${state.aluf ? '\n<span class="key">🌌 ALUF: </span><span class="str">offen</span>' : ''}
+        `;
+
+        pulse.classList.add('active');
+
+    } catch (e) {
+        status.innerHTML = `❌ FEHLER: ${e.message}`;
+        log.textContent = `ERROR: ${e.message}`;
+        console.error(e);
+    }
+}
+
+// ─── RESET ──────────────────────────────────────────────────
+function reset() {
+    state.values = [3, 9, 27, 81, 243, 729, 2187, 6561, 19683];
+    state.axis3 = [];
+    state.axis9 = [];
+    state.axis27 = [];
+    state.axis81 = [];
+    state.pipeline21 = [];
+    state.life360 = [];
+    state.blitz21 = [];
+    state.graviton = {};
+    state.shadow = null;
+    state.aluf = null;
+    state.evo = null;
+    state.nirwana = null;
+    state.grell = false;
+    state.respo = false;
+    state.maxMode = false;
+    state.minMode = false;
+    state.stationMode = false;
+    state.activeStation = 'd';
+
+    pulse.classList.remove('active');
+    render(state.values);
+    status.innerHTML = '⟲ RESET · <span class="highlight">MULTIVERSUM BEREIT</span>';
+    log.textContent = '⟲ Reset durchgeführt. MULTIVERSUM bereit.';
+}
+
+// ─── TOGGLES ─────────────────────────────────────────────────
+function toggleGrell() {
+    state.grell = !state.grell;
+    render(state.values);
+    log.textContent = state.grell ? '✨ GRELL aktiv · Universum leuchtet' : '✨ GRELL deaktiviert';
+}
+
+function toggleRespo() {
+    state.respo = !state.respo;
+    render(state.values);
+    log.textContent = state.respo ? '🌀 RESPO aktiv · Durchlassachse offen' : '🌀 RESPO deaktiviert';
+}
+
+function toggleMax() {
+    state.maxMode = !state.maxMode;
+    render(state.values);
+    log.textContent = state.maxMode ? '⬆ MAXIMUM markiert' : '⬆ MAXIMUM deaktiviert';
+}
+
+function toggleMin() {
+    state.minMode = !state.minMode;
+    render(state.values);
+    log.textContent = state.minMode ? '⬇ MINIMUM markiert' : '⬇ MINIMUM deaktiviert';
+}
+
+function toggleStations() {
+    state.stationMode = !state.stationMode;
+    render(state.values);
+    log.textContent = state.stationMode ? `🎯 STATIONEN-Modus · ${state.activeStation.toUpperCase()}` : '🎯 STATIONEN-Modus deaktiviert';
+}
+
+// ─── STATIONEN · GRID ───────────────────────────────────────
+stationGrid.addEventListener('click', (e) => {
+    const item = e.target.closest('.station-item');
+    if (!item) return;
+
+    const station = item.dataset.station;
+    if (station && STATIONEN.includes(station)) {
+        stationGrid.querySelectorAll('.station-item').forEach(el => el.classList.remove('active'));
+        item.classList.add('active');
+        state.activeStation = station;
+        state.stationMode = true;
+        render(state.values);
+        log.textContent = `🎯 STATION: ${station.toUpperCase()} · aktiv · DURCHLASSACHSE: offen`;
+        status.innerHTML = `🎯 STATION ${station.toUpperCase()} · <span class="highlight">AKTIV</span> · MULTIVERSUM · GRELL`;
+    }
+});
+
+// ─── INIT ──────────────────────────────────────────────────
+buildCube();
+render(state.values);
+
+// ─── EVENTS ──────────────────────────────────────────────────
+btnRun.addEventListener('click', run);
+btnReset.addEventListener('click', reset);
+btnGrell.addEventListener('click', toggleGrell);
+btnRespo.addEventListener('click', toggleRespo);
+btnMax.addEventListener('click', toggleMax);
+btnMin.addEventListener('click', toggleMin);
+btnStations.addEventListener('click', toggleStations);
+
+// ─── AUTO‑START ─────────────────────────────────────────────
+setTimeout(() => {
+    run();
+    setTimeout(() => {
+        state.grell = true;
+        render(state.values);
+        status.innerHTML = `🌌 MULTIVERSUM · <span class="grell">GRELL</span> · <span class="highlight">UNIVERSUM OFFEN</span> · iki1uc`;
+    }, 400);
+}, 300);
+
+console.log('🌌 MULTIVERSUM · GRELL · iki1uc geladen');
+console.log('📦 ROOT:', ROOT);
+console.log('🎯 STATIONEN:', STATIONEN);
+</script>
+</body>
+</html>
