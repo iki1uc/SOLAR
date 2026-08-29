@@ -1,52 +1,69 @@
-// ─── 81.js · UNI-9 · 360° Lebensraum ───────────────────────────────
-export function UNI9(values) {
+// ─── CACHE-DRIVER · FINALVERSION ───────────────────────────────
+// TMP · Session · Shadow · Pipelineblitz-State
 
-  // 1) 3-Achse: Grundsortierung
-  const axis3 = values
-    .map(Number)
-    .filter(n => !isNaN(n))
-    .sort((a,b)=>a-b);
+import { Algorithmik } from "./algorithmik.js";
 
-  // 2) 9-Achse: Struktur
-  const axis9 = axis3.map((v,i)=>({
-    value: v,
-    index: i,
-    degree: (i * 40),       // 9 Punkte → 360° / 9 = 40°
-    percent: (v / axis3[axis3.length-1]) * 100,
-    vector: i === 0 ? 0 : v - axis3[i-1],
-    te: v + "te"
-  }));
+export const CacheDriver = {
 
-  // 3) 27-Achse: Matrix
-  const axis27 = axis9.map(a => ({
-    ...a,
-    delta: Math.abs(a.value - axis3[0]),
-    knot: a.index % 3 === 0
-  }));
+  // 1) INIT · Schattenstart
+  init() {
+    this.tmp = {};
+    this.state = "IDLE";
+    this.last = null;
+    this.tick = performance.now();
+    this.shadow = true;            // kommt aus dem Schatten
+  },
 
-  // 4) 81-Achse: Raum (Findung)
-  const axis81 = axis27.map(a => ({
-    ...a,
-    room: a.degree >= 80 && a.degree <= 120,   // 81-Raum
-    station: a.degree === 80                   // 81-Fundpunkt
-  }));
+  // 2) STORE · Werte sichern
+  store(key, values) {
+    const calc = Algorithmik.RUN(values);
 
-  // 5) Pipeline21: 50%-Regel
-  const pipeline21 = axis81.map(a => ({
-    ...a,
-    half: a.value * 0.5,
-    full: a.value,
-    deltaHalf: a.full - a.half
-  }));
+    this.tmp[key] = {
+      raw: calc.raw,
+      axis3: calc.axis3,
+      axis9: calc.axis9,
+      axis27: calc.axis27,
+      axis81: calc.axis81,
+      pipeline21: calc.pipeline21,
+      life360: calc.life360,
+      stamp: performance.now()
+    };
 
-  // 6) Lebensmatrix zurückgeben
-  return {
-    raw: values,
-    axis3,
-    axis9,
-    axis27,
-    axis81,
-    pipeline21,
-    life360: axis9.map(a => a.degree)
-  };
-}
+    this.last = key;
+    this.state = "ACTIVE";
+  },
+
+  // 3) LOAD · Werte abrufen
+  load(key) {
+    return this.tmp[key] || null;
+  },
+
+  // 4) TMP-RESPOS · Schattenantwort
+  respond(key) {
+    const entry = this.load(key);
+    if (!entry) return null;
+
+    return {
+      axis3: entry.axis3,
+      axis9: entry.axis9,
+      axis27: entry.axis27,
+      axis81: entry.axis81,
+      pipeline21: entry.pipeline21,
+      life360: entry.life360,
+      stamp: entry.stamp
+    };
+  },
+
+  // 5) CLEAR · Schatten löschen
+  clear(key) {
+    delete this.tmp[key];
+    if (this.last === key) this.last = null;
+    this.state = "IDLE";
+  },
+
+  // 6) RUN · Komplettausführung
+  RUN(key, values) {
+    this.store(key, values);
+    return this.respond(key);
+  }
+};
