@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LACHT · Schwingung · Humor</title>
+<style>
+body { background:#000; color:#0f0; font-family:Consolas; padding:20px; }
+pre { font-size:18px; }
+</style>
+</head>
+<body>
+
+<h2>LACHT · Schwingung</h2>
+<pre id="laugh">INIT…</pre>
+
+<script type="module">
+import { Schwingung } from "./uni.engine.js";
+
+let f = 1;
+
+function pulse(){
+    const s = Schwingung.calc(f);
+    const face = (s.swing > 0 ? "😄" : "😐");
+
+    document.getElementById("laugh").innerText = `
+LACHT FRAME ${f}
+
+Schwingung: ${s.swing}
+Solar: ${s.solar}
+Energie: ${s.energy}
+Gravitation: ${s.gravitation}
+
+ASCII-Humor:
+${face}
+`;
+
+    f++;
+}
+
+setInterval(pulse, 300);
+</script>
+
+</body>
+</html>
