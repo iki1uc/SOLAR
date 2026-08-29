@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SEN·SA·TION · POVER-ENERGIE · SOLAR</title>
+
+<style>
+body {
+  background:#000;
+  color:#0f0;
+  font-family:monospace;
+  text-align:center;
+  padding:20px;
+}
+
+#cube {
+  width:360px;
+  height:360px;
+  margin:auto;
+  position:relative;
+}
+
+.cell {
+  width:30px;
+  height:30px;
+  background:#020;
+  border:1px solid #0f0;
+  position:absolute;
+  transition:0.2s;
+}
+
+.cell:hover {
+  background:#0f0;
+}
+
+#status {
+  margin-top:20px;
+  font-size:14px;
+  color:#0f0;
+}
+
+#log {
+  margin-top:20px;
+  width:80%;
+  height:200px;
+  background:#010;
+  color:#0f0;
+  border:1px solid #0f0;
+  padding:10px;
+  overflow:auto;
+  margin-left:auto;
+  margin-right:auto;
+}
+</style>
+</head>
+
+<body>
+
+<h1>SEN·SA·TION · POVER-ENERGIE</h1>
+<div id="cube"></div>
+<div id="status"></div>
+<pre id="log"></pre>
+
+<script type="module">
+
+import { UNIEngine } from "./uni.engine.js";
+import { Schwingung } from "./uni.engine.js";
+
+const cube = document.getElementById("cube");
+const status = document.getElementById("status");
+const log = document.getElementById("log");
+
+// ROOT-Parameter
+const ROOT = { height:360, width:360, depth:360 };
+
+// Cube erzeugen
+let cells = [];
+
+for(let r=0; r<9; r++){
+  for(let c=0; c<9; c++){
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.style.left = (c*40)+"px";
+    cell.style.top  = (r*40)+"px";
+
+    const v = (r*9)+c+1;
+    const s = Schwingung.calc(v);
+
+    cell.dataset.value = v;
+    cell.dataset.swing = s.swing;
+    cell.dataset.solar = s.solar;
+    cell.dataset.energy = s.energy;
+    cell.dataset.grav = s.gravitation;
+
+    cell.onclick = () => {
+      log.innerText += `CELL ${v} → SWING:${s.swing} SOLAR:${s.solar} ENERGY:${s.energy} GRAV:${s.gravitation}\n`;
+    };
+
+    cube.appendChild(cell);
+    cells.push(cell);
+  }
+}
+
+// Auto-Run
+const values = cells.map(c => Number(c.dataset.value));
+const result = UNIEngine.RUN("SENSA", values);
+
+// Status-Bar
+status.innerHTML = `
+AX3:${result.axis3.length} · 
+AX9:${result.axis9.length} · 
+AX27:${result.axis27.length} · 
+AX81:${result.axis81.length} · 
+SWING:ATOMAR · 
+SOLAR:-1 · 
+ENERGIE:+1 · 
+GRAV:33%
+`;
+
+// Matrix-Log
+log.innerText = JSON.stringify(result, null, 2);
+
+</script>
+
+</body>
+</html>
