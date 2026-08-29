@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SOLAR · ROUTER · SYSTEM</title>
+<style>
+body { background:#000; color:#0f0; font-family:Consolas; padding:20px; }
+h2 { color:#0f0; }
+button {
+  background:#020; color:#0f0; border:1px solid #0f0;
+  padding:10px; margin:5px; cursor:pointer; font-family:Consolas;
+}
+pre { font-size:16px; line-height:20px; margin-top:20px; }
+</style>
+</head>
+<body>
+
+<h2>SOLAR · ROUTER · SYSTEM</h2>
+
+<div>
+  <button onclick="load('hall.html')">HALL</button>
+  <button onclick="load('index.html')">INDEX</button>
+  <button onclick="load('TION.html')">TION</button>
+  <button onclick="load('ZENzzAURAsiMANAsieren.html')">ZEN</button>
+  <button onclick="load('bewegung.html')">BEWEGUNG</button>
+  <button onclick="load('licht.html')">LICHT</button>
+  <button onclick="load('lacht.html')">LACHT</button>
+  <button onclick="load('quick.html')">QUICK</button>
+</div>
+
+<pre id="status">ROUTER INIT…</pre>
+
+<script type="module">
+import { TION } from "./TION.js";
+
+function load(page){
+    document.getElementById("status").innerText =
+        `ROUTER: Lade Modul → ${page}\nALUF: offen\nROOT: 480/480/480\nSEN·SA·TION: aktiv`;
+    window.location.href = page;
+}
+
+function pulse(){
+    const out = TION.RUN();
+
+    document.getElementById("status").innerText = `
+ROUTER · SYSTEMPULSE
+
+${out}
+
+ROUTER:
+• Module schaltbar
+• Impulse aktiv
+• ALUF offen
+• ROOT stabil
+• Pipelineblitz synchron
+• FeuerIce align
+
+MELDUNG:
+"Router aktiv. System vollständig."
+`;
+}
+
+setInterval(pulse, 600);
+</script>
+
+</body>
+</html>
