@@ -1,1 +1,13 @@
-
+{
+  station: "u.html",
+  aluf: {
+    A: "axis3",      // Achse
+    L: "life360",    // Licht
+    U: "OUR.base",   // Ursprung
+    F: "exit()"      // Freiheit (Ausweg)
+  },
+  exit: function() {
+    // Jede Station kann jetzt verlassen werden
+    return "FREI";
+  }
+}
